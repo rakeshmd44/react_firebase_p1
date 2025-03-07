@@ -101,6 +101,18 @@ export default function PeopleList() {
       minWidth: 130,
     },
     {
+      field: 'tq',
+      headerName: 'Taluk/Tehsil',
+      flex: 1,
+      minWidth: 130,
+    },
+    {
+      field: 'dist',
+      headerName: 'District',
+      flex: 1,
+      minWidth: 130,
+    },
+    {
       field: 'state',
       headerName: 'State',
       flex: 1,
@@ -239,6 +251,12 @@ export default function PeopleList() {
           initialState={{
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },
+            },
+            columns: {
+              columnVisibilityModel: {
+                state: false,
+                country: false,
+              },
             },
           }}
           pageSizeOptions={[5, 10, 25, 50]}

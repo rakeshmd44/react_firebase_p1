@@ -138,6 +138,20 @@ export default function GroupMembers() {
       minWidth: 130,
     },
     {
+      field: 'tq',
+      headerName: 'Taluk/Tehsil',
+      description: 'Administrative division below district',
+      flex: 1,
+      minWidth: 130,
+    },
+    {
+      field: 'dist',
+      headerName: 'District',
+      description: 'Administrative division of state',
+      flex: 1,
+      minWidth: 130,
+    },
+    {
       field: 'state',
       headerName: 'State',
       flex: 1,
@@ -230,6 +244,12 @@ export default function GroupMembers() {
             pagination: {
               paginationModel: { page: 0, pageSize: 10 },
             },
+            columns: {
+              columnVisibilityModel: {
+                state: false,
+                country: false,
+              },
+            },
           }}
           pageSizeOptions={[5, 10, 25, 50]}
           slots={{ toolbar: GridToolbar }}
@@ -273,6 +293,12 @@ export default function GroupMembers() {
             initialState={{
               pagination: {
                 paginationModel: { page: 0, pageSize: 10 },
+              },
+              columns: {
+                columnVisibilityModel: {
+                  state: false,
+                  country: false,
+                },
               },
             }}
             pageSizeOptions={[5, 10, 25, 50]}

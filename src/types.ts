@@ -10,6 +10,8 @@ export interface Person {
   postal_code: string;
   created_at: string;
   updated_at: string;
+  tq: string;
+  dist: string;
 }
 
 export interface Group {

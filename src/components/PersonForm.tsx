@@ -12,7 +12,17 @@ import {
   Snackbar,
   Alert
 } from '@mui/material';
-import { doc, getDoc, setDoc, addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { 
+  doc, 
+  getDoc, 
+  setDoc, 
+  addDoc, 
+  collection, 
+  serverTimestamp,
+  query,
+  where,
+  getDocs
+} from 'firebase/firestore';
 import { db } from '../firebase';
 import { Person } from '../types';
 
@@ -26,12 +36,39 @@ export default function PersonForm() {
     phone_number: '',
     street_address: '',
     city: '',
+    tq: '', // Taluk/Tehsil
+    dist: '', // District
     state: '',
-    country: '',
+    country: 'India',
     postal_code: ''
   });
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState('');
+
+  const checkExistingPerson = async (firstName: string, lastName: string): Promise<boolean> => {
+    try {
+      // Create a query to check for existing people with the same first and last name
+      const peopleRef = collection(db, 'People_Mng');
+      const q = query(
+        peopleRef,
+        where('first_name', '==', firstName),
+        where('last_name', '==', lastName)
+      );
+      
+      const querySnapshot = await getDocs(q);
+      
+      // If we're editing an existing person, exclude the current person from the check
+      if (id) {
+        return querySnapshot.docs.some(doc => doc.id !== id);
+      }
+      
+      // For new person, any match means a duplicate
+      return !querySnapshot.empty;
+    } catch (error) {
+      console.error('Error checking existing person:', error);
+      throw new Error('Failed to check for existing person');
+    }
+  };
 
   const fetchPerson = useCallback(async () => {
     if (id) {
@@ -47,7 +84,9 @@ export default function PersonForm() {
           city: data.city || '',
           state: data.state || '',
           country: data.country || '',
-          postal_code: data.postal_code || ''
+          postal_code: data.postal_code || '',
+          tq: data.tq || '',
+          dist: data.dist || ''
         });
       }
     }
@@ -62,6 +101,13 @@ export default function PersonForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Check for existing person with same name
+      const exists = await checkExistingPerson(formData.first_name, formData.last_name);
+      if (exists) {
+        setError('A person with this name already exists. Please use a different name.');
+        return;
+      }
+
       const timestamp = serverTimestamp();
       if (id) {
         await setDoc(doc(db, 'People_Mng', id), {
@@ -81,8 +127,10 @@ export default function PersonForm() {
           phone_number: '',
           street_address: '',
           city: '',
+          tq: '',
+          dist: '',
           state: '',
-          country: '',
+          country: 'India',
           postal_code: ''
         });
       }
@@ -140,6 +188,7 @@ export default function PersonForm() {
           )}
 
           <Grid container spacing={2}>
+            {/* Personal Information */}
             <Grid item xs={12} sm={6}>
               <TextField
                 fullWidth
@@ -170,6 +219,8 @@ export default function PersonForm() {
                 required
               />
             </Grid>
+
+            {/* Address Information - Ordered as per Firestore structure */}
             <Grid item xs={12}>
               <TextField
                 fullWidth
@@ -177,7 +228,6 @@ export default function PersonForm() {
                 name="street_address"
                 value={formData.street_address}
                 onChange={handleChange}
-                required
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -187,7 +237,26 @@ export default function PersonForm() {
                 name="city"
                 value={formData.city}
                 onChange={handleChange}
-                required
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="Taluk/Tehsil"
+                name="tq"
+                value={formData.tq}
+                onChange={handleChange}
+                placeholder="Enter Taluk/Tehsil"
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                label="District"
+                name="dist"
+                value={formData.dist}
+                onChange={handleChange}
+                placeholder="Enter District"
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -197,7 +266,6 @@ export default function PersonForm() {
                 name="state"
                 value={formData.state}
                 onChange={handleChange}
-                required
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -207,7 +275,6 @@ export default function PersonForm() {
                 name="country"
                 value={formData.country}
                 onChange={handleChange}
-                required
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -217,7 +284,6 @@ export default function PersonForm() {
                 name="postal_code"
                 value={formData.postal_code}
                 onChange={handleChange}
-                required
               />
             </Grid>
           </Grid>

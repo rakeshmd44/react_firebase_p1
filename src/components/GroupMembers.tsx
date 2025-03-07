@@ -257,6 +257,10 @@ export default function GroupMembers() {
             toolbar: {
               showQuickFilter: true,
               quickFilterProps: { debounceMs: 500 },
+              csvOptions: { 
+                fileName: `${group?.name || 'group'}-members`,
+                utf8WithBom: true,
+              },
             },
           }}
           sx={{
@@ -307,6 +311,10 @@ export default function GroupMembers() {
               toolbar: {
                 showQuickFilter: true,
                 quickFilterProps: { debounceMs: 500 },
+                csvOptions: { 
+                  fileName: `${group?.name || 'group'}-members`,
+                  utf8WithBom: true,
+                },
               },
             }}
             sx={{

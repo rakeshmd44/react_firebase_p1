@@ -265,6 +265,10 @@ export default function PeopleList() {
             toolbar: {
               showQuickFilter: true,
               quickFilterProps: { debounceMs: 500 },
+              csvOptions: { 
+                  fileName: 'all-people',
+                  utf8WithBom: true,
+              }
             },
           }}
           sx={{
